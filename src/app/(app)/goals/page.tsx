@@ -34,7 +34,7 @@ export default async function GoalsPage() {
   return (
     <div>
       <h1 className="mb-6 text-3xl font-bold">My Goals</h1>
-      <AddGoalForm parentCategories={parentCategories} />
+      <AddGoalForm parentCategories={parentCategories || []} />
       {goals && goals.length > 0 ? (
         <ul className="space-y-4">
           {goals.map((goal) => (
