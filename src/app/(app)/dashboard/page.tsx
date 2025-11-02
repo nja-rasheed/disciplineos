@@ -4,6 +4,7 @@ import TimeChart from "@/components/features/dashboard/TimeChart"
 import HabitHeatMap from "@/components/features/dashboard/HabitHeatMap"
 import HabitHeatmap from "@/components/features/dashboard/HabitHeatMap";
 import GoalTimeWidget from "@/components/features/dashboard/GoalTimeWidget"
+import AiAnalytics from "@/components/features/dashboard/AiAnalytics"
 export default async function DashboardPage() {
   const supabase = createServer();
     const { data: { user } } = await supabase.auth.getUser();
@@ -48,7 +49,6 @@ export default async function DashboardPage() {
     .rpc('get_dashboard_analytics', {
       p_user_id: user.id,
     })
-  
   if (goalRpcError) {
     console.error('Error fetching goal analytics:', goalRpcError)
   }
@@ -57,6 +57,9 @@ export default async function DashboardPage() {
   return (
     <div>
       <h1 className="text-3xl font-bold">My Dashboard</h1>
+      <div className="mt-6">
+        <AiAnalytics />
+      </div>
       {timeAnalytics && timeAnalytics.length > 0 ? (
         <TimeChart data={timeAnalytics} />
       ) : (

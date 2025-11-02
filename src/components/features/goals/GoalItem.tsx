@@ -50,6 +50,11 @@ export default function GoalItem({ goal, parentCategories }: GoalItemProps) {
     goal.parent_category_id ? goal.parent_category_id.toString() : ''
   )
 
+  //state for AI plan
+  const [isAiPlanPannelOpen, setIsAiPlanPannelOpen] = useState(false);
+  const [aiPlan, setAiPlan] = useState<string[]>([]);
+  const [isFetchingPlan, setIsFetchingPlan] = useState(false);
+
   // --- Action Handlers ---
   const handleUpdate = (formData: FormData) => {
     startSaveTransition(async () => {
@@ -73,6 +78,23 @@ export default function GoalItem({ goal, parentCategories }: GoalItemProps) {
     setNewParentCatId(
       goal.parent_category_id ? goal.parent_category_id.toString() : ''
     )
+  }
+  async function handleAiPlan(id: number) {
+    setIsFetchingPlan(true);
+    setIsAiPlanPannelOpen(true);
+    try {
+      const response = await fetch(`/api/goals`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ goalId: id }),
+      });
+      const data = await response.json();
+      setAiPlan(data.suggested_steps || []);
+    } catch (err) {
+      console.error('Error fetching AI plan:', err);
+    } finally {
+      setIsFetchingPlan(false);
+    }
   }
 
   return (
@@ -173,6 +195,74 @@ export default function GoalItem({ goal, parentCategories }: GoalItemProps) {
           
           {/* Sub-task Components (moved from the page) */}
           <GoalPercentagePage subTasks={goal.sub_tasks || []} />
+          {/* --- AI PLAN SECTION --- */}
+          {/* === AI PLAN BUTTON === */}
+          <button
+            onClick={() => handleAiPlan(goal.id)}
+            disabled={isFetchingPlan}
+            className={`mt-3 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
+              isFetchingPlan
+                ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
+                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+            }`}
+          >
+            {isFetchingPlan ? (
+              <>
+                <span className="animate-spin inline-block">⏳</span>
+                Generating Plan...
+              </>
+            ) : (
+              <>
+                <span>✨</span>
+                Get AI Plan
+              </>
+            )}
+          </button>
+
+          {/* === AI PLAN PANEL === */}
+          {isAiPlanPannelOpen && (
+            <div
+              className="mt-4 rounded-xl border border-gray-700 bg-gray-900/80 p-5 shadow-md backdrop-blur transition-all duration-500 ease-in-out"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-yellow-400 text-lg">💡</span>
+                  <h3 className="text-lg font-semibold text-indigo-400">
+                    {isFetchingPlan ? 'Generating Your Plan...' : 'AI Suggested Steps'}
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setIsAiPlanPannelOpen(false)}
+                  className="text-gray-400 hover:text-red-400 text-lg transition"
+                >
+                  ❌
+                </button>
+              </div>
+
+              {/* Loader while fetching */}
+              {isFetchingPlan ? (
+                <div className="flex items-center gap-2 text-gray-400">
+                  <span className="animate-spin text-indigo-400">⚙️</span>
+                  <span>Analyzing your goal and generating steps...</span>
+                </div>
+              ) : aiPlan.length > 0 ? (
+                <ul className="list-disc list-inside space-y-2">
+                  {aiPlan.map((step, index) => (
+                    <li key={index} className="text-gray-300 flex items-start gap-2">
+                      <span className="text-indigo-400 mt-0.5">✨</span>
+                      <span>{step}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-400 italic flex items-center gap-2">
+                  <span className="text-yellow-400">💭</span>
+                  No steps were generated for this goal.
+                </p>
+              )}
+            </div>
+          )}
+
           <AddSubTaskForm goalId={goal.id} />
           <ul className="mt-2 list-disc list-inside">
             {goal.sub_tasks && goal.sub_tasks.length > 0 ? (

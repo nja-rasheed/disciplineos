@@ -41,7 +41,6 @@ export default function AddGoalForm({parentCategories} : AddGoalFormProps) {
                     <select name="parent_category_id"
                         className="mt-4 w-full rounded-lg border border-gray-700 bg-gray-800 p-2 text-white"
                     >
-                        <option value="">No Parent Category</option>
                         {parentCategories?.map((category) => (
                             <option key={category.id} value={category.id}>
                                 {category.name}
