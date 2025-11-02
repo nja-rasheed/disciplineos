@@ -44,8 +44,8 @@ export default async function TimeHistoryPage() {
             // Use session.id as the key
             <div key={session.id} className="rounded-lg bg-gray-800 p-4 shadow">
               <p className="font-semibold text-white">
-                {/* Use optional chaining for safety */}
-                Category: {session.time_categories?.name || 'Uncategorized'}
+                {/* Add [0] to access the first item in the array */}
+                Category: {session.time_categories?.[0]?.name || 'Uncategorized'}
               </p>
               <p className="text-gray-300">
                 Duration: {formatDuration(session.duration_seconds)}
