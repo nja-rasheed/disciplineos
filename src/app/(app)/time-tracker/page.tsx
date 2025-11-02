@@ -53,7 +53,7 @@ export default async function TimeTrackerPage() { // Renamed for clarity
 
       {/* Category Management Section */}
       <div className="mt-8">
-        <AddTimeCategoryForm parentCategory={parentCategories}/>
+        <AddTimeCategoryForm parentCategory={parentCategories || []}/>
 
         <h2 className="mb-4 mt-6 text-2xl font-bold">Your Categories</h2>
         <ul className="space-y-2">
