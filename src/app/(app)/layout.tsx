@@ -1,7 +1,6 @@
 import { createServer } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import AppShell from '@/components/layout/AppShell' // Import our shell
-import Sidebar from '@/components/layout/Sidebar'
+import AppShell from '@/components/layout/AppShell' // Import our new shell
 
 export default async function AppLayout({
   children,
@@ -17,7 +16,8 @@ export default async function AppLayout({
     redirect('/login')
   }
 
-  // Pass the children into the AppShell
-  // This layout correctly wraps ONLY your protected app pages
-  return <AppShell sidebar={<Sidebar />}>{children}</AppShell>
+  // --- THIS IS THE FIX ---
+  // The AppShell component renders the Sidebar and Navbar internally.
+  // We just need to render the AppShell and pass the page (children) to it.
+  return <AppShell>{children}</AppShell>
 }
